@@ -1,0 +1,110 @@
+<!-- templates/result.html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Analysis Result — Deception Detector</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">🧠 Deception Detector</div>
+    <nav class="nav-right"><a href="/">New Analysis</a></nav>
+  </header>
+
+  <main class="wrap">
+    <section class="card result-card">
+      <div class="result-head">
+        <h1>Analysis Report</h1>
+        {% if result %}
+          <div class="badge {% if result['label'] == 'Deceptive' %}danger{% else %}ok{% endif %}">
+            {{ result['label'] }}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="grid">
+        <div class="panel final-risk">
+          <h3>Final Risk</h3>
+          <canvas id="gauge" width="360" height="200"></canvas>
+          <p class="muted">Deception Risk: <strong>{{ result['score'] if result else 0 }}%</strong></p>
+        </div>
+
+        <div class="panel">
+          <h3>Modal Confidence</h3>
+          <canvas id="radar" width="350" height="260"></canvas>
+          <div class="bars">
+            <div class="bar-row"><span>Text</span><div class="bar"><div class="bar-fill" style="width: {{ (result['text_score'] if result and result['text_score'] else 0) }}%"></div></div><span>{{ result['text_score'] if result and result['text_score'] else 0 }}%</span></div>
+            <div class="bar-row"><span>Audio</span><div class="bar"><div class="bar-fill" style="width: {{ (result['audio_score'] if result and result['audio_score'] else 0) }}%"></div></div><span>{{ result['audio_score'] if result and result['audio_score'] else 0 }}%</span></div>
+            <div class="bar-row"><span>Video</span><div class="bar"><div class="bar-fill" style="width: {{ (result['video_score'] if result and result['video_score'] else 0) }}%"></div></div><span>{{ result['video_score'] if result and result['video_score'] else 0 }}%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="transcript">
+        <h4>Analyzed Text / Transcript</h4>
+        <p>{{ text if text else "No transcript/text provided." }}</p>
+      </div>
+
+      <div class="actions">
+        <a class="btn-primary" href="/">← Analyze another</a>
+        <a class="btn-ghost" href="#" onclick="window.print();return false;">Export PDF</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">© 2025 Deception Detector • Demo</footer>
+
+<script>
+  // Data from template
+  const fused = {{ result['score'] if result else 0 }};
+  const textVal = {{ result['text_score'] if result and result['text_score'] else 0 }};
+  const audioVal = {{ result['audio_score'] if result and result['audio_score'] else 0 }};
+  const videoVal = {{ result['video_score'] if result and result['video_score'] else 0 }};
+  const label = "{{ result['label'] if result else 'Truth' }}";
+
+  // Gauge: semi-circle doughnut
+  const gctx = document.getElementById('gauge').getContext('2d');
+  const gauge = new Chart(gctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Risk','Remaining'],
+      datasets: [{
+        data: [fused, 100 - fused],
+        backgroundColor: [ label === 'Deceptive' ? '#ef4444' : '#16a34a', '#e6e6e6' ],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      cutout: '78%',
+      rotation: -90,
+      circumference: 180,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } }
+    }
+  });
+
+  // Radar
+  const rctx = document.getElementById('radar').getContext('2d');
+  new Chart(rctx, {
+    type: 'radar',
+    data: {
+      labels: ['Text','Audio','Video'],
+      datasets: [{
+        label: 'Confidence (%)',
+        data: [textVal, audioVal, videoVal],
+        fill: true,
+        backgroundColor: 'rgba(59,130,246,0.15)',
+        borderColor: 'rgba(59,130,246,1)',
+        pointBackgroundColor: 'rgba(59,130,246,1)'
+      }]
+    },
+    options: {
+      scales: { r: { suggestedMin: 0, suggestedMax: 100 } },
+      plugins: { legend: { display: false } }
+    }
+  });
+</script>
+</body>
+</html>

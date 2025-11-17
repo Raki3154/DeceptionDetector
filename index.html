@@ -1,0 +1,60 @@
+<!-- templates/index.html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Detecting Deceptive Speech</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">🧠 Deception Detector</div>
+    <nav class="nav-right"><a href="#">Home</a> <a href="#">Docs</a> <a href="#">About</a></nav>
+  </header>
+
+  <main class="wrap">
+    <section class="card">
+      <h1>Analyze statement</h1>
+      <p class="muted">Paste text, upload/record audio, or both. The dashboard will show modality confidences.</p>
+
+      <form id="analysisForm" action="/analyze" method="post" enctype="multipart/form-data">
+        <label class="label">Text input</label>
+        <textarea id="text" name="text" placeholder="Type or paste text (optional)"></textarea>
+
+        <div class="row">
+          <div class="col">
+            <label class="label">Upload audio</label>
+            <input id="audio" name="audio" type="file" accept="audio/*">
+            <div id="audioPreview" class="preview small"></div>
+          </div>
+
+          <div class="col">
+            <label class="label">Upload video (optional)</label>
+            <input id="video" name="video" type="file" accept="video/*">
+            <div id="videoPreview" class="preview small"></div>
+          </div>
+        </div>
+
+        <div class="record-panel">
+          <button type="button" id="recordBtn" class="btn-alt">🎤 Start Recording</button>
+          <span id="recordStatus" class="muted">Idle</span>
+          <audio id="player" controls style="display:none;"></audio>
+          <canvas id="visualizer" height="60"></canvas>
+        </div>
+
+        <div class="actions">
+          <button class="btn-primary" type="submit">🔎 Analyze</button>
+          <button class="btn-ghost" type="button" id="clearBtn">Clear</button>
+        </div>
+
+        <p class="hint">You may submit just text, just audio, or both. If only audio is provided we will transcribe and analyze it.</p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="footer">© 2025 Deception Detector • Demo</footer>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
